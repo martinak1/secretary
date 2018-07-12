@@ -1,5 +1,6 @@
 // DB interactions
 extern crate rusqlite;
+
 use rusqlite::*;
 
 struct DB {
@@ -22,29 +23,44 @@ fn main() {
         name: String::from("2018"),
     };
 
-    // Create a table
-    cal.db.execute(
-        "CREATE TABLE July (
+    fn create_table(cal: DB, month: String){
+        cal.db.execute(format!(
+            "CREATE TABLE {} (
             id      INTEGER PRIMARY KEY,
             date    INTEGER NOT NULL,
             name    TEXT NOT NULL,
-            desc    TEXT
-         )",
-         &[]
-    ).unwrap();
+            desc    TEXT    
+            )", month),
+            &[]
+        ).unwrap();
+    }
 
     // Insert values into July table
-    cal.db.execute(
-        "INSERT INTO July (
-            id, date, name, desc
-         )",
-         &[&0, &12, &"Work".to_string(), &"I do this five days a week".to_string()]
-    ).unwrap();
+    // cal.db.execute(
+    //     "INSERT INTO July (
+    //         id, date, name, desc
+    //      )",
+    //      &[&0, &12, &"Work".to_string(), &"I do this five days a week".to_string()]
+    // ).unwrap();
+
+    fn insert_entry(cal: DB, month: String, entries: vec![]){
+        cal.db.execute(format!(
+            "INSERT INTO {} (
+                id, date, name, desc
+                )", month),
+                &entries
+        ).unwrap();
+    }
 
     // Create the query
     let mut qresults = cal.db.prepare(
         "SELECT id, date, event, desc FROM July"
     ).unwrap();
+
+    fn get_month(cal: DB, month: String) -> Result<Statement<'l>, Err>{
+        let s = cal.db.prepare(format!("SELECT id, date, event, desc FROM {}", month))?;
+        Ok(s)
+    }
 
     // Execute query and iter the results 
     let qriter = qresults.query_map(&[], |row| {
