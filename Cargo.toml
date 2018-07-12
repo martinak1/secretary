@@ -1,0 +1,6 @@
+[package]
+name = "secretary"
+version = "0.1.0"
+authors = ["resnet@RAMS.adp.vcu.edu"]
+
+[dependencies]
