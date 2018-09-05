@@ -1,74 +1,47 @@
-extern crate rusqlite;
-use rusqlite::*;
+// for sqlite interaction
+use rusqlite::{self, Connection, Error, Statement};
 
+// for path handeling
 use std::path::PathBuf;
 
-struct Event;
+// for default path
+use std::env;
 
-/// Struct that represents a SQLite database
-struct DB {
-    name: String,
-    db:   Connection,
+// for events
+//pub mod event;
+use event::Event;
+
+
+/// Struct that wraps around our DB
+pub struct DB {
+    path: String,
+    db: Connection,
 }
 
-// functions
-impl DB {
-    /// Creates a new database
-    fn new (path: PathBuf) -> Result<DB, Err> {
 
+impl DB {
+    /// Opens the database at the given path, or creates it if it does not already exist
+    pub fn open(path: String) -> Result<Connection, Error> {
+        Connection::open(path)
     }
-    /// Opens and existing database 
-    fn open (path: PathBuf) -> Result<DB, Err> {
-        Ok( 
-            DB {
-                name: path.file_name(),
-                db: Connection.open(path)?,
-            }
-        )
-    }
+
+
 }
 
-// methods
 impl DB {
-    /// Save the database and closes it 
-    fn close (&mut self) -> Result<(), Err> {
-        self.db.commit()?;
-        self.db.close()?;
-        Ok(())
-    }
+    /// Returns a Result holding a vector of events from the database
+    pub fn get_events(&self, sql: String) -> Result<Vec<Event>, Error> {
+        let mut stmnt = self.db.prepare(sql.as_str())?;
+        let mut rows = stmnt.query(&[])?;
+        let mut events: Vec<Event> = vec![];
 
-    /// Save transactions to disk
-    fn commit (&mut self) -> Result<(), Err> {
-        self.db.commit()?;
-    }
+        while let Some(row) = rows.next() {
+            let row = row.unwrap();
+            events.push(
+                Event::new(row.get(0), row.get(1), row.get(2))
+            );
+        }
 
-    /// Add and event to the calendar
-    fn add_event (&mut self, event: Event) -> Result<(), Err> {
-
-    }
-
-    /// Drop an event from the calendar
-    fn drop_event (&mut self, event: Event) -> Result<(), Err> {
-
-    }
-
-    /// Check for time confilts
-    fn check_conflict(&mut self, event: Event) -> Option<Event> {
-
-    }
-
-    /// Create a view of a day
-    fn view_day (&self, date: String) -> () {
-
-    }
-
-    /// Create a view of a month
-    fn view_month (&self, date: String) -> () {
-
-    }
-
-    /// Create a view of a year
-    fn view_year (&self, date: String) -> () {
-
+        Ok(events)
     }
 }

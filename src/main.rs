@@ -1,81 +1,37 @@
-// DB interactions
 extern crate rusqlite;
 
-use rusqlite::*;
+pub mod db;
+use db::DB;
 
-struct DB {
-    name: String,
-    db: Connection,
-}
-
-#[derive(Debug)]
-struct Event {
-    id: i32,
-    date: i32,
-    name: String,
-    desc: String,
-}
+pub mod event;
+use event::Event;
 
 fn main() {
 
-    let cal = DB {
-        name: String::from("2018"),
-        db: Connection::open_in_memory().unwrap(),
-    };
+/*     let db = DB::open(String::from("./secretary.db")).unwrap();
 
-/*     fn create_table(cal: DB, month: String){
-        cal.db.execute(format!(
-            "CREATE TABLE {} (
-            id      INTEGER PRIMARY KEY, // Add auto increment or use index_of_last_transaction, but that could get messy
-            date    INTEGER NOT NULL,
-            name    TEXT NOT NULL,
-            desc    TEXT    
-            )", month),
-            &[]
-        ).unwrap();
-    } */
-
-    // Insert values into July table
-    // cal.db.execute(
-    //     "INSERT INTO July (
-    //         id, date, name, desc
-    //      )",
-    //      &[&0, &12, &"Work".to_string(), &"I do this five days a week".to_string()]
-    // ).unwrap();
-
-/*     fn insert_entry(cal: DB, month: String, entries: vec![]){
-        cal.db.execute(format!(
-            "INSERT INTO {} (
-                id, date, name, desc
-                )", month),
-                &entries
-        ).unwrap();
-    } */
-
-    // Create the query
-    let mut qresults = cal.db.prepare(
-        "SELECT id, date, event, desc FROM July"
+     db.execute(
+        "
+        create table mycal (name TEXT, desc TEXT, date DATE);
+        insert into mycal (name, date, desc) values ('My Birthday', '09/22/2018', 'My Birthday');
+        insert into mycal (name, date, desc) values ('Jaleesa's Birthday', '10/22/2018', 'Jaleesa's Birthday');
+        ",
+        &[]
     ).unwrap();
 
-/*     fn get_month(cal: DB, month: String) -> Result<Statement<'l>, Err>{
-        let s = cal.db.prepare(format!("SELECT id, date, event, desc FROM {}", month))?;
-        Ok(s)
-    }
- */
-    // Execute query and iter the results 
-    let qriter = qresults.query_map(&[], |row| {
-        Event {
-            id:   row.get(0),
-            date: row.get(1),
-            name: row.get(2),
-            desc: row.get(3),
+    let tables: Result<Event, _> = db.query_row(
+        "select * from mycal",
+         &[],
+        |row| -> Event {
+            Event::new( 
+                row.get(0),
+                row.get(1),
+                row.get(2)
+            )
+
         }
-    }).unwrap();
+    );
+ */
 
-    for event in qriter {
-        println!(
-            "{:?}", event.unwrap()
-        );
-    }
-
+    let db = DB::open("./secretary.db".to_owned()).unwrap();
 }
