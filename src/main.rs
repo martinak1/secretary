@@ -10,14 +10,7 @@ fn main() {
 
 /*     let db = DB::open(String::from("./secretary.db")).unwrap();
 
-     db.execute(
-        "
-        create table mycal (name TEXT, desc TEXT, date DATE);
-        insert into mycal (name, date, desc) values ('My Birthday', '09/22/2018', 'My Birthday');
-        insert into mycal (name, date, desc) values ('Jaleesa's Birthday', '10/22/2018', 'Jaleesa's Birthday');
-        ",
-        &[]
-    ).unwrap();
+
 
     let tables: Result<Event, _> = db.query_row(
         "select * from mycal",
@@ -34,4 +27,16 @@ fn main() {
  */
 
     let db = DB::open("./secretary.db".to_owned()).unwrap();
+
+    //create table mycal (name TEXT, desc TEXT, date DATE);
+    db.db.execute_batch(
+        "
+        insert into mycal (name, desc, date) values ('Birthday', 'My birtday', '09/22/2018');
+        insert into mycal (name, desc, date) values ('Vet', 'Vet appointment', '09/23/2018');
+        "
+    ).unwrap();
+
+    let query = "select * from mycal".to_owned();
+
+    println!("{:?}", db.get_tables());
 }
