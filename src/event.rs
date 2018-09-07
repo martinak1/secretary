@@ -4,7 +4,7 @@ use rusqlite::{Error, Row};
 #[derive(Debug)]
 pub struct Event {
     id:   Option<i64>,
-    table: String,
+    cal: String,
     name: String,
     desc: String,
     date: String,
@@ -15,10 +15,10 @@ pub struct Event {
 impl Event {
     
     /// Create a new event
-    pub fn new(table: String, name: String, desc: String, date: String) -> Event {
+    pub fn new(cal: String, name: String, desc: String, date: String) -> Event {
         Event {
             id: None,
-            table,
+            cal,
             name,
             desc,
             date
@@ -29,7 +29,7 @@ impl Event {
         Ok (
             Event {
                 id: Some(row.get(0)),
-                table: "mycal".to_owned(),
+                cal: "mycal".to_owned(),
                 name: row.get(1),
                 desc: row.get(2),
                 date: row.get(3)
@@ -63,5 +63,10 @@ impl Event {
     /// Return the date of the event
     pub fn get_date(&self) -> &String {
         &self.date
+    }
+
+    /// Return the calander the event is held in
+    pub fn get_cal(&self) -> &String {
+        &self.cal
     }
 }

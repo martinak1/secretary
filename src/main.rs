@@ -7,36 +7,40 @@ pub mod event;
 use event::Event;
 
 fn main() {
+    test();
+}
 
-/*     let db = DB::open(String::from("./secretary.db")).unwrap();
+fn test() {
+    let mut db = DB::open("./secretary.db".to_owned()).unwrap();
 
+    db.add_cal("testdb".to_owned()).unwrap();
 
+    println!("{:?}", db.get_cals());
 
-    let tables: Result<Event, _> = db.query_row(
-        "select * from mycal",
-         &[],
-        |row| -> Event {
-            Event::new( 
-                row.get(0),
-                row.get(1),
-                row.get(2)
-            )
+    let events = vec![
+        Event::new(
+           "functiontest".to_owned(),
+           "Birthday".to_owned(),
+           "Its my birthday".to_owned(),
+           "09/22/2018".to_owned(),
+        ),
+        Event::new(
+            "functiontest".to_owned(),
+            "Work".to_owned(),
+            "I do this a lot".to_owned(),
+            "09/20/2018".to_owned(),
+        )
+    ];
 
-        }
-    );
- */
+    // TODO broken
+    db.add_events(events).unwrap();
 
-    let db = DB::open("./secretary.db".to_owned()).unwrap();
+    let events = db.get_all_events();
 
-    //create table mycal (name TEXT, desc TEXT, date DATE);
-    db.db.execute_batch(
-        "
-        insert into mycal (name, desc, date) values ('Birthday', 'My birtday', '09/22/2018');
-        insert into mycal (name, desc, date) values ('Vet', 'Vet appointment', '09/23/2018');
-        "
-    ).unwrap();
+    println!("{:#?}", events);
+  
+    // TODO broken
+    //db.drop_cal("test".to_owned()).unwrap();
 
-    let query = "select * from mycal".to_owned();
-
-    println!("{:?}", db.get_tables());
+    println!("{:?}", db.get_cals());
 }
